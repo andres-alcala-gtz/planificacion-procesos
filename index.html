@@ -15,11 +15,119 @@
 <body>
 
     <!-- Programa -->
-    <p>¡Hola, Mundo!</p>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <div class="col text-start">
+                <span class="navbar-brand">Planificación de procesos</span>
+            </div>
+            <div class="col text-center">
+                <div class="input-group">
+                    <span class="input-group-text">Procesos</span>
+                    <input class="form-control" id="input-process" type="number" placeholder="0 < x" required>
+                </div>
+            </div>
+            <div class="col text-end">
+                <button class="btn btn-success" id="input-button" type="submit">Ejecutar</button>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <div class="container-fluid">
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        <table class="table table-light caption-top">
+                            <thead>
+                                <tr>
+                                    <th>Temporizador</th>
+                                    <th>Lotes restantes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="timer-global">-</td>
+                                    <td id="counter-batch">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <table class="table table-light caption-top">
+                            <caption>Lote en ejecución</caption>
+                            <thead>
+                                <tr>
+                                    <th>Lote</th>
+                                    <th>Proceso</th>
+                                    <th>Tiempo estimado</th>
+                                    <th>Tiempo ejecutado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-waiting">
+                                <!-- Información -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col">
+                        <table class="table table-light caption-top">
+                            <caption>Proceso en ejecución</caption>
+                            <tbody>
+                                <tr>
+                                    <th>Lote</th>
+                                    <td id="table-running-identifier-batch">-</td>
+                                </tr>
+                                <tr>
+                                    <th>Proceso</th>
+                                    <td id="table-running-identifier-process">-</td>
+                                </tr>
+                                <tr>
+                                    <th>Operación</th>
+                                    <td id="table-running-operation-complete">-</td>
+                                </tr>
+                                <tr>
+                                    <th>Tiempo estimado</th>
+                                    <td id="table-running-time-estimated">-</td>
+                                </tr>
+                                <tr>
+                                    <th>Tiempo ejecutado</th>
+                                    <td id="table-running-time-executed">-</td>
+                                </tr>
+                                <tr>
+                                    <th>Tiempo restante</th>
+                                    <td id="table-running-time-executed-remaining">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col">
+                        <table class="table table-light caption-top">
+                            <caption>Procesos terminados</caption>
+                            <thead>
+                                <tr>
+                                    <th>Lote</th>
+                                    <th>Proceso</th>
+                                    <th>Operación</th>
+                                    <th>Resultado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-terminated">
+                                <!-- Información -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <!-- JavaScript -->
     <script src="vendors/bootstrap-5/js/bootstrap.bundle.js"></script>
     <script src="vendors/advanced-timer-2/src/main.js"></script>
+    <script src="resources/js/configuration.js"></script>
+    <script src="resources/js/support.js"></script>
+    <script src="resources/js/process.js"></script>
+    <script src="resources/js/index.js"></script>
 
 </body>
 </html>
