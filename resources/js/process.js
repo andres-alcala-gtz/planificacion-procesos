@@ -27,9 +27,9 @@ class ProcessRegular
         return `${this.operationLeft} ${this.operationSymbol} ${this.operationRight}`;
     }
 
-    terminate()
+    terminate(successful)
     {
-        this.operationResult = eval(this.operationComplete).toFixed(2);
+        this.operationResult = successful ? eval(this.operationComplete).toFixed(2) : CODE.ERROR;
     }
 }
 

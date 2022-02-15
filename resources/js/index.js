@@ -25,7 +25,9 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
         manageCreated();
 
+        document.addEventListener("keydown", keyListener);
         await run();
+        document.removeEventListener("keydown", keyListener);
 
         TIMER_GLOBAL.destroy();
     }
@@ -106,7 +108,7 @@ document.getElementById("input-button").addEventListener("click", (() => {
             return;
         }
 
-        moveRunningTerminated();
+        moveRunningTerminated(true);
     }
 
 
@@ -140,11 +142,22 @@ document.getElementById("input-button").addEventListener("click", (() => {
     }
 
 
-    function moveRunningTerminated()
+    function moveRunningWaiting()
+    {
+        arrayWaiting.push(arrayRunning.shift());
+
+        arrayWaiting.at(-1).timeLast = CODE.NULL;
+
+        drawRunning();
+        drawWaiting();
+    }
+
+
+    function moveRunningTerminated(successful)
     {
         arrayTerminated.push(arrayRunning.shift());
 
-        arrayTerminated.at(-1).terminate();
+        arrayTerminated.at(-1).terminate(successful);
 
         drawRunning();
         drawTerminated();
@@ -223,6 +236,34 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
             rowTerminated.append(identifierBatch, identifierProcess, operationComplete, operationResult);
             tableTerminated.append(rowTerminated);
+        }
+    }
+
+
+    function keyListener(event)
+    {
+        console.log(event.key);
+
+        switch (event.key)
+        {
+            case KEY.INTERRUPT:
+                moveRunningWaiting();
+                break;
+
+            case KEY.TERMINATE:
+                moveRunningTerminated(false);
+                break;
+
+            case KEY.PAUSE:
+                TIMER_GLOBAL.pause();
+                break;
+
+            case KEY.RESUME:
+                TIMER_GLOBAL.resume();
+                break;
+
+            default:
+                break;
         }
     }
 

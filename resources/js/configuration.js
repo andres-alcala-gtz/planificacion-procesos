@@ -27,6 +27,13 @@ const STATE = {
     TERMINATED: "TERMINATED"
 }
 
+const KEY = {
+    INTERRUPT: "i",
+    TERMINATE: "e",
+    PAUSE    : "p",
+    RESUME   : "c"
+}
+
 const CODE = {
     ERROR: "ERROR",
     NULL : "-"
