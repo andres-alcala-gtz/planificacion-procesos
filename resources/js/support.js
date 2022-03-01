@@ -10,13 +10,13 @@ function timeFill(segment)
 
 function timeFormat(centisecond)
 {
+    if (centisecond === CODE.NULL)
+    {
+        return CODE.NULL;
+    }
+
     let m  = Math.floor((centisecond / 6000) / (  1));
     let s  = Math.floor((centisecond % 6000) / (100));
     let cs = Math.floor((centisecond % 6000) % (100));
     return `${timeFill(m)}:${timeFill(s)}.${timeFill(cs)}`;
-}
-
-function identifierBatch(identifierProcess)
-{
-    return Math.floor((identifierProcess - 1) / CAPACITY.BATCH) + 1;
 }

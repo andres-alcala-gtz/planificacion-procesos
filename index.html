@@ -40,13 +40,13 @@
                             <thead>
                                 <tr>
                                     <th>Temporizador</th>
-                                    <th>Lotes restantes</th>
+                                    <th>Procesos creados</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td id="timer-global">-</td>
-                                    <td id="counter-batch">-</td>
+                                    <td id="counter-created">-</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -55,10 +55,24 @@
                 <div class="row">
                     <div class="col">
                         <table class="table table-light caption-top">
-                            <caption>Lote en ejecución</caption>
+                            <caption>Procesos bloqueados</caption>
                             <thead>
                                 <tr>
-                                    <th>Lote</th>
+                                    <th>Proceso</th>
+                                    <th>Tiempo condenado</th>
+                                    <th>Tiempo bloqueado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-blocked">
+                                <!-- Información -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col">
+                        <table class="table table-light caption-top">
+                            <caption>Procesos preparados</caption>
+                            <thead>
+                                <tr>
                                     <th>Proceso</th>
                                     <th>Tiempo estimado</th>
                                     <th>Tiempo ejecutado</th>
@@ -71,12 +85,8 @@
                     </div>
                     <div class="col">
                         <table class="table table-light caption-top">
-                            <caption>Proceso en ejecución</caption>
+                            <caption>Proceso activo</caption>
                             <tbody>
-                                <tr>
-                                    <th>Lote</th>
-                                    <td id="table-running-identifier-batch">-</td>
-                                </tr>
                                 <tr>
                                     <th>Proceso</th>
                                     <td id="table-running-identifier-process">-</td>
@@ -105,7 +115,6 @@
                             <caption>Procesos terminados</caption>
                             <thead>
                                 <tr>
-                                    <th>Lote</th>
                                     <th>Proceso</th>
                                     <th>Operación</th>
                                     <th>Resultado</th>
@@ -115,6 +124,44 @@
                                 <!-- Información -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="modal fade" id="modal-process" tabindex="-1">
+                    <div class="modal-dialog modal-fullscreen">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <span class="modal-title">Procesos</span>
+                                <button class="btn btn-close" type="button" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table table-light caption-top">
+                                    <caption id="timer-process">-</caption>
+                                    <thead>
+                                        <tr>
+                                            <th>Proceso</th>
+                                            <th>Estado</th>
+                                            <th>Operación</th>
+                                            <th>Resultado</th>
+                                            <th>Estimado</th>
+                                            <th>Ejecutado</th>
+                                            <th>Restante</th>
+                                            <th>Bloqueado</th>
+                                            <th>Restante</th>
+                                            <th>Llegada</th>
+                                            <th>Término</th>
+                                            <th>Respuesta</th>
+                                            <th>Retorno</th>
+                                            <th>Espera</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-process">
+                                        <!-- Información -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

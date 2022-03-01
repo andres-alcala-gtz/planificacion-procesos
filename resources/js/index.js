@@ -11,6 +11,7 @@ document.getElementById("input-button").addEventListener("click", (() => {
     const TIMER_GLOBAL = new Timer(10);
 
     let arrayCreated = new Array();
+    let arrayBlocked = new Array();
     let arrayWaiting = new Array();
     let arrayRunning = new Array();
     let arrayTerminated = new Array();
@@ -40,6 +41,7 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
                 drawHeader();
 
+                manageBlocked();
                 manageWaiting();
                 manageRunning();
                 manageTerminated();
@@ -60,23 +62,47 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
         for (let i = 0; i < inputProcess; ++i)
         {
-            arrayCreated.push(new ProcessRandom());
+            moveUndefinedCreated();
+        }
+
+        let arrayCreatedLength = arrayCreated.length;
+        for (let i = 0; i < Math.min(CAPACITY.MEMORY, arrayCreatedLength); ++i)
+        {
+            moveCreatedWaiting();
+        }
+    }
+
+
+    function manageBlocked()
+    {
+        if ((!arrayBlocked.length))
+        {
+            return;
+        }
+
+        for (let i = 0; i < arrayBlocked.length; ++i)
+        {
+            arrayBlocked.at(i).timeBlocked += TIMER_GLOBAL.currentCycle - arrayBlocked.at(i).timeLast;
+            arrayBlocked.at(i).timeLast = TIMER_GLOBAL.currentCycle;
+
+            if (arrayBlocked.at(i).timeBlockedRemaining <= 0)
+            {
+                moveBlockedWaiting();
+            }
+
+            drawBlocked();
         }
     }
 
 
     function manageWaiting()
     {
-        if ((!arrayCreated.length || arrayWaiting.length || arrayRunning.length))
+        if ((!arrayCreated.length) || (arrayBlocked.length + arrayWaiting.length + arrayRunning.length >= CAPACITY.MEMORY))
         {
             return;
         }
 
-        let arrayCreatedLength = arrayCreated.length;
-        for (let i = 0; i < Math.min(CAPACITY.BATCH, arrayCreatedLength); ++i)
-        {
-            moveCreatedWaiting();
-        }
+        moveCreatedWaiting();
     }
 
 
@@ -114,12 +140,24 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
     function manageEnding()
     {
-        if ((arrayCreated.length || arrayWaiting.length || arrayRunning.length))
+        if ((arrayCreated.length || arrayBlocked.length || arrayWaiting.length || arrayRunning.length))
         {
             return;
         }
 
         TIMER_GLOBAL.repeat(false);
+        drawProcess();
+    }
+
+
+    function moveUndefinedCreated()
+    {
+        arrayCreated.push(new ProcessRandom());
+
+        arrayCreated.at(-1).stateProcess = STATE.CREATED;
+        arrayCreated.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
+
+        drawHeader();
     }
 
 
@@ -127,6 +165,24 @@ document.getElementById("input-button").addEventListener("click", (() => {
     {
         arrayWaiting.push(arrayCreated.shift());
 
+        arrayWaiting.at(-1).stateProcess = STATE.WAITING;
+        arrayWaiting.at(-1).timeArrived = TIMER_GLOBAL.currentCycle;
+        arrayWaiting.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
+
+        drawHeader();
+        drawWaiting();
+    }
+
+
+    function moveBlockedWaiting()
+    {
+        arrayWaiting.push(arrayBlocked.shift());
+
+        arrayWaiting.at(-1).stateProcess = STATE.WAITING;
+        arrayWaiting.at(-1).timeBlocked = CODE.NULL;
+        arrayWaiting.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
+
+        drawBlocked();
         drawWaiting();
     }
 
@@ -135,10 +191,30 @@ document.getElementById("input-button").addEventListener("click", (() => {
     {
         arrayRunning.push(arrayWaiting.shift());
 
+        arrayRunning.at(-1).stateProcess = STATE.RUNNING;
         arrayRunning.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
+
+        if (!arrayRunning.at(-1).flagExecuted)
+        {
+            arrayRunning.at(-1).timeReplied = TIMER_GLOBAL.currentCycle - arrayRunning.at(-1).timeArrived;
+            arrayRunning.at(-1).flagExecuted = true;
+        }
 
         drawWaiting();
         drawRunning();
+    }
+
+
+    function moveRunningBlocked()
+    {
+        arrayBlocked.push(arrayRunning.shift());
+
+        arrayBlocked.at(-1).stateProcess = STATE.BLOCKED;
+        arrayBlocked.at(-1).timeBlocked = 0;
+        arrayBlocked.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
+
+        drawRunning();
+        drawBlocked();
     }
 
 
@@ -146,7 +222,8 @@ document.getElementById("input-button").addEventListener("click", (() => {
     {
         arrayWaiting.push(arrayRunning.shift());
 
-        arrayWaiting.at(-1).timeLast = CODE.NULL;
+        arrayWaiting.at(-1).stateProcess = STATE.WAITING;
+        arrayWaiting.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
 
         drawRunning();
         drawWaiting();
@@ -157,7 +234,10 @@ document.getElementById("input-button").addEventListener("click", (() => {
     {
         arrayTerminated.push(arrayRunning.shift());
 
+        arrayTerminated.at(-1).stateProcess = STATE.TERMINATED;
         arrayTerminated.at(-1).terminate(successful);
+        arrayTerminated.at(-1).timeDeparted = TIMER_GLOBAL.currentCycle;
+        arrayTerminated.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
 
         drawRunning();
         drawTerminated();
@@ -167,7 +247,29 @@ document.getElementById("input-button").addEventListener("click", (() => {
     function drawHeader()
     {
         document.getElementById("timer-global").textContent = timeFormat(TIMER_GLOBAL.currentCycle);
-        document.getElementById("counter-batch").textContent = identifierBatch(arrayCreated.length);
+        document.getElementById("counter-created").textContent = arrayCreated.length;
+    }
+
+
+    function drawBlocked()
+    {
+        let tableBlocked = document.getElementById("table-blocked");
+        tableBlocked.replaceChildren();
+
+        for (const process of arrayBlocked)
+        {
+            let rowBlocked = document.createElement("tr");
+            let identifierProcess = document.createElement("td");
+            let timeCondemned = document.createElement("td");
+            let timeBlocked = document.createElement("td");
+
+            identifierProcess.textContent = process.identifierProcess;
+            timeCondemned.textContent = timeFormat(TIME.MAX_BLOCKED);
+            timeBlocked.textContent = timeFormat(process.timeBlocked);
+
+            rowBlocked.append(identifierProcess, timeCondemned, timeBlocked);
+            tableBlocked.append(rowBlocked);
+        }
     }
 
 
@@ -179,17 +281,15 @@ document.getElementById("input-button").addEventListener("click", (() => {
         for (const process of arrayWaiting)
         {
             let rowWaiting = document.createElement("tr");
-            let identifierBatch = document.createElement("td");
             let identifierProcess = document.createElement("td");
             let timeEstimated = document.createElement("td");
             let timeExecuted = document.createElement("td");
 
-            identifierBatch.textContent = process.identifierBatch;
             identifierProcess.textContent = process.identifierProcess;
             timeEstimated.textContent = timeFormat(process.timeEstimated);
             timeExecuted.textContent = timeFormat(process.timeExecuted);
 
-            rowWaiting.append(identifierBatch, identifierProcess, timeEstimated, timeExecuted);
+            rowWaiting.append(identifierProcess, timeEstimated, timeExecuted);
             tableWaiting.append(rowWaiting);
         }
     }
@@ -197,7 +297,6 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
     function drawRunning()
     {
-        document.getElementById("table-running-identifier-batch").textContent = CODE.NULL;
         document.getElementById("table-running-identifier-process").textContent = CODE.NULL;
         document.getElementById("table-running-operation-complete").textContent = CODE.NULL;
         document.getElementById("table-running-time-estimated").textContent = CODE.NULL;
@@ -206,7 +305,6 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
         for (const process of arrayRunning)
         {
-            document.getElementById("table-running-identifier-batch").textContent = process.identifierBatch;
             document.getElementById("table-running-identifier-process").textContent = process.identifierProcess;
             document.getElementById("table-running-operation-complete").textContent = process.operationComplete;
             document.getElementById("table-running-time-estimated").textContent = timeFormat(process.timeEstimated);
@@ -224,19 +322,69 @@ document.getElementById("input-button").addEventListener("click", (() => {
         for (const process of arrayTerminated)
         {
             let rowTerminated = document.createElement("tr");
-            let identifierBatch = document.createElement("td");
             let identifierProcess = document.createElement("td");
             let operationComplete = document.createElement("td");
             let operationResult = document.createElement("td");
 
-            identifierBatch.textContent = process.identifierBatch;
             identifierProcess.textContent = process.identifierProcess;
             operationComplete.textContent = process.operationComplete;
             operationResult.textContent = process.operationResult;
 
-            rowTerminated.append(identifierBatch, identifierProcess, operationComplete, operationResult);
+            rowTerminated.append(identifierProcess, operationComplete, operationResult);
             tableTerminated.append(rowTerminated);
         }
+    }
+
+
+    function drawProcess()
+    {
+        let arrayProcess = [].concat(arrayCreated, arrayBlocked, arrayWaiting, arrayRunning, arrayTerminated);
+
+        let modalProcess = new bootstrap.Modal(document.getElementById("modal-process"));
+
+        let tableProcess = document.getElementById("table-process");
+        tableProcess.replaceChildren();
+
+        document.getElementById("timer-process").textContent = timeFormat(TIMER_GLOBAL.currentCycle);
+
+        for (const process of arrayProcess)
+        {
+            let rowProcess = document.createElement("tr");
+            let identifierProcess = document.createElement("td");
+            let stateProcess = document.createElement("td");
+            let operationComplete = document.createElement("td");
+            let operationResult = document.createElement("td");
+            let timeEstimated = document.createElement("td");
+            let timeExecuted = document.createElement("td");
+            let timeExecutedRemaining = document.createElement("td");
+            let timeBlocked = document.createElement("td");
+            let timeBlockedRemaining = document.createElement("td");
+            let timeArrived = document.createElement("td");
+            let timeDeparted = document.createElement("td");
+            let timeReplied = document.createElement("td");
+            let timeReturned = document.createElement("td");
+            let timeHalted = document.createElement("td");
+
+            identifierProcess.textContent = process.identifierProcess;
+            stateProcess.textContent = process.stateProcess;
+            operationComplete.textContent = process.operationComplete;
+            operationResult.textContent = process.operationResult;
+            timeEstimated.textContent = timeFormat(process.timeEstimated);
+            timeExecuted.textContent = timeFormat(process.timeExecuted);
+            timeExecutedRemaining.textContent = timeFormat(process.timeExecutedRemaining);
+            timeBlocked.textContent = timeFormat(process.timeBlocked);
+            timeBlockedRemaining.textContent = timeFormat(process.timeBlockedRemaining);
+            timeArrived.textContent = timeFormat(process.timeArrived);
+            timeDeparted.textContent = timeFormat(process.timeDeparted);
+            timeReplied.textContent = timeFormat(process.timeReplied);
+            timeReturned.textContent = timeFormat(process.timeReturned);
+            timeHalted.textContent = timeFormat(process.timeHalted);
+
+            rowProcess.append(identifierProcess, stateProcess, operationComplete, operationResult, timeEstimated, timeExecuted, timeExecutedRemaining, timeBlocked, timeBlockedRemaining, timeArrived, timeDeparted, timeReplied, timeReturned, timeHalted);
+            tableProcess.append(rowProcess);
+        }
+
+        modalProcess.show();
     }
 
 
@@ -246,12 +394,21 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
         switch (event.key)
         {
+            case KEY.CREATE:
+                moveUndefinedCreated();
+                break;
+
             case KEY.INTERRUPT:
-                moveRunningWaiting();
+                moveRunningBlocked();
                 break;
 
             case KEY.TERMINATE:
                 moveRunningTerminated(false);
+                break;
+
+            case KEY.PROCESS:
+                TIMER_GLOBAL.pause();
+                drawProcess();
                 break;
 
             case KEY.PAUSE:

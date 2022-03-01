@@ -5,21 +5,57 @@ class ProcessRegular
     constructor(operationLeft, operationRight, operationSymbol, timeEstimated)
     {
         this.identifierProcess = ++ProcessRegular.identifierCurrent;
-        this.identifierBatch = identifierBatch(this.identifierProcess);
+        this.stateProcess = CODE.NULL;
 
         this.operationLeft = operationLeft;
         this.operationRight = operationRight;
         this.operationSymbol = operationSymbol;
         this.operationResult = CODE.NULL;
 
+        this.flagExecuted = false;
+
         this.timeEstimated = timeEstimated;
         this.timeExecuted = 0;
+        this.timeBlocked = CODE.NULL;
+        this.timeArrived = CODE.NULL;
+        this.timeDeparted = CODE.NULL;
+        this.timeReplied = CODE.NULL;
         this.timeLast = CODE.NULL;
     }
 
     get timeExecutedRemaining()
     {
         return this.timeEstimated - this.timeExecuted;
+    }
+
+    get timeBlockedRemaining()
+    {
+        if (this.timeBlocked === CODE.NULL)
+        {
+            return CODE.NULL;
+        }
+
+        return TIME.MAX_BLOCKED - this.timeBlocked;
+    }
+
+    get timeReturned()
+    {
+        if (this.timeArrived === CODE.NULL || this.timeDeparted === CODE.NULL)
+        {
+            return CODE.NULL;
+        }
+
+        return this.timeDeparted - this.timeArrived;
+    }
+
+    get timeHalted()
+    {
+        if (this.timeReturned === CODE.NULL)
+        {
+            return CODE.NULL;
+        }
+
+        return this.timeReturned - this.timeExecuted;
     }
 
     get operationComplete()

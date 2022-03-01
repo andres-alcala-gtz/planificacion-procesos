@@ -1,8 +1,9 @@
 const CAPACITY = {
-    BATCH: 5
+    MEMORY: 5
 }
 
 const TIME = {
+    MAX_BLOCKED  :  8 * 100,
     MIN_ESTIMATED:  6 * 100,
     MAX_ESTIMATED: 16 * 100
 }
@@ -22,14 +23,17 @@ const OPERATOR = {
 
 const STATE = {
     CREATED   : "CREATED",
+    BLOCKED   : "BLOCKED",
     WAITING   : "WAITING",
     RUNNING   : "RUNNING",
     TERMINATED: "TERMINATED"
 }
 
 const KEY = {
+    CREATE   : "n",
     INTERRUPT: "i",
     TERMINATE: "e",
+    PROCESS  : "t",
     PAUSE    : "p",
     RESUME   : "c"
 }
