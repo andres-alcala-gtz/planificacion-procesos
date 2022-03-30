@@ -26,6 +26,12 @@
                     <input class="form-control" id="input-process" type="number" placeholder="0 < x" required>
                 </div>
             </div>
+            <div class="col text-center">
+                <div class="input-group">
+                    <span class="input-group-text">Rodaja</span>
+                    <input class="form-control" id="input-slot" type="number" placeholder="3 < x < 6" required>
+                </div>
+            </div>
             <div class="col text-end">
                 <button class="btn btn-success" id="input-button" type="submit">Ejecutar</button>
             </div>
@@ -40,12 +46,14 @@
                             <thead>
                                 <tr>
                                     <th>Temporizador</th>
+                                    <th>Rodaja</th>
                                     <th>Procesos creados</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td id="timer-global">-</td>
+                                    <td id="timer-slot">-</td>
                                     <td id="counter-created">-</td>
                                 </tr>
                             </tbody>
@@ -98,6 +106,10 @@
                                 <tr>
                                     <th>Tiempo estimado</th>
                                     <td id="table-running-time-estimated">-</td>
+                                </tr>
+                                <tr>
+                                    <th>Tiempo rodaja</th>
+                                    <td id="table-running-time-slot">-</td>
                                 </tr>
                                 <tr>
                                     <th>Tiempo ejecutado</th>

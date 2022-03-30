@@ -15,6 +15,7 @@ class ProcessRegular
         this.flagExecuted = false;
 
         this.timeEstimated = timeEstimated;
+        this.timeSlot = 0;
         this.timeExecuted = 0;
         this.timeBlocked = CODE.NULL;
         this.timeArrived = CODE.NULL;

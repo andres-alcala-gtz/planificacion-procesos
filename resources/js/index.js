@@ -8,6 +8,13 @@ document.getElementById("input-button").addEventListener("click", (() => {
         return;
     }
 
+    let inputSlot = document.getElementById("input-slot").value * 100;
+    if (3 * 100 > inputSlot || 6 * 100 < inputSlot)
+    {
+        alert("Condición no cumplida en Rodaja (3 < x < 6)");
+        return;
+    }
+
     const TIMER_GLOBAL = new Timer(10);
 
     let arrayCreated = new Array();
@@ -22,6 +29,7 @@ document.getElementById("input-button").addEventListener("click", (() => {
     async function exec()
     {
         document.getElementById("input-process").disabled = true;
+        document.getElementById("input-slot").disabled = true;
         document.getElementById("input-button").disabled = true;
 
         manageCreated();
@@ -119,8 +127,14 @@ document.getElementById("input-button").addEventListener("click", (() => {
         }
         if (arrayRunning.length)
         {
+            arrayRunning.at(-1).timeSlot += TIMER_GLOBAL.currentCycle - arrayRunning.at(-1).timeLast;
             arrayRunning.at(-1).timeExecuted += TIMER_GLOBAL.currentCycle - arrayRunning.at(-1).timeLast;
             arrayRunning.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
+
+            if (arrayRunning.at(-1).timeSlot >= inputSlot)
+            {
+                moveRunningWaiting();
+            }
 
             drawRunning();
         }
@@ -210,6 +224,7 @@ document.getElementById("input-button").addEventListener("click", (() => {
         arrayBlocked.push(arrayRunning.shift());
 
         arrayBlocked.at(-1).stateProcess = STATE.BLOCKED;
+        arrayBlocked.at(-1).timeSlot = 0;
         arrayBlocked.at(-1).timeBlocked = 0;
         arrayBlocked.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
 
@@ -223,6 +238,7 @@ document.getElementById("input-button").addEventListener("click", (() => {
         arrayWaiting.push(arrayRunning.shift());
 
         arrayWaiting.at(-1).stateProcess = STATE.WAITING;
+        arrayWaiting.at(-1).timeSlot = 0;
         arrayWaiting.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
 
         drawRunning();
@@ -236,6 +252,7 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
         arrayTerminated.at(-1).stateProcess = STATE.TERMINATED;
         arrayTerminated.at(-1).terminate(successful);
+        arrayTerminated.at(-1).timeSlot = 0;
         arrayTerminated.at(-1).timeDeparted = TIMER_GLOBAL.currentCycle;
         arrayTerminated.at(-1).timeLast = TIMER_GLOBAL.currentCycle;
 
@@ -247,6 +264,7 @@ document.getElementById("input-button").addEventListener("click", (() => {
     function drawHeader()
     {
         document.getElementById("timer-global").textContent = timeFormat(TIMER_GLOBAL.currentCycle);
+        document.getElementById("timer-slot").textContent = timeFormat(inputSlot);
         document.getElementById("counter-created").textContent = arrayCreated.length;
     }
 
@@ -300,6 +318,7 @@ document.getElementById("input-button").addEventListener("click", (() => {
         document.getElementById("table-running-identifier-process").textContent = CODE.NULL;
         document.getElementById("table-running-operation-complete").textContent = CODE.NULL;
         document.getElementById("table-running-time-estimated").textContent = CODE.NULL;
+        document.getElementById("table-running-time-slot").textContent = CODE.NULL;
         document.getElementById("table-running-time-executed").textContent = CODE.NULL;
         document.getElementById("table-running-time-executed-remaining").textContent = CODE.NULL;
 
@@ -308,6 +327,7 @@ document.getElementById("input-button").addEventListener("click", (() => {
             document.getElementById("table-running-identifier-process").textContent = process.identifierProcess;
             document.getElementById("table-running-operation-complete").textContent = process.operationComplete;
             document.getElementById("table-running-time-estimated").textContent = timeFormat(process.timeEstimated);
+            document.getElementById("table-running-time-slot").textContent = timeFormat(process.timeSlot);
             document.getElementById("table-running-time-executed").textContent = timeFormat(process.timeExecuted);
             document.getElementById("table-running-time-executed-remaining").textContent = timeFormat(process.timeExecutedRemaining);
         }
