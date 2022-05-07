@@ -177,6 +177,11 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
     function moveCreatedWaiting()
     {
+        if (!arrayCreated.length)
+        {
+            return;
+        }
+
         arrayWaiting.push(arrayCreated.shift());
 
         arrayWaiting.at(-1).stateProcess = STATE.WAITING;
@@ -190,6 +195,11 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
     function moveBlockedWaiting()
     {
+        if (!arrayBlocked.length)
+        {
+            return;
+        }
+
         arrayWaiting.push(arrayBlocked.shift());
 
         arrayWaiting.at(-1).stateProcess = STATE.WAITING;
@@ -203,6 +213,11 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
     function moveWaitingRunning()
     {
+        if (!arrayWaiting.length)
+        {
+            return;
+        }
+
         arrayRunning.push(arrayWaiting.shift());
 
         arrayRunning.at(-1).stateProcess = STATE.RUNNING;
@@ -221,6 +236,11 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
     function moveRunningBlocked()
     {
+        if (!arrayRunning.length)
+        {
+            return;
+        }
+
         arrayBlocked.push(arrayRunning.shift());
 
         arrayBlocked.at(-1).stateProcess = STATE.BLOCKED;
@@ -235,6 +255,11 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
     function moveRunningWaiting()
     {
+        if (!arrayRunning.length)
+        {
+            return;
+        }
+
         arrayWaiting.push(arrayRunning.shift());
 
         arrayWaiting.at(-1).stateProcess = STATE.WAITING;
@@ -248,6 +273,11 @@ document.getElementById("input-button").addEventListener("click", (() => {
 
     function moveRunningTerminated(successful)
     {
+        if (!arrayRunning.length)
+        {
+            return;
+        }
+
         arrayTerminated.push(arrayRunning.shift());
 
         arrayTerminated.at(-1).stateProcess = STATE.TERMINATED;
